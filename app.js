@@ -1,3 +1,63 @@
+// Scroll Animation container
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.section-content');
+    const container = document.querySelector('.container');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate');
+                container.classList.add('animate-background');
+            } else {
+                entry.target.classList.remove('animate');
+                container.classList.remove('animate-background');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+});
+
+// // Scroll Animation section
+// document.addEventListener("DOMContentLoaded", function() {
+//     // Function to handle the intersection of elements
+//     function handleIntersection(entries, observer) {
+//         entries.forEach(entry => {
+//             if (entry.isIntersecting) {
+//                 const target = entry.target;
+//                 // Ensure animation class is added each time the element comes into view
+//                 target.classList.add('visible');
+
+//                 // Reset animation by removing and re-adding the class
+//                 // to make sure it plays every time
+//                 target.classList.remove('animate');
+//                 void target.offsetWidth; // Trigger reflow to restart animation
+//                 target.classList.add('animate');
+//             }
+//         });
+//     }
+
+//     // Options for Intersection Observer
+//     const options = {
+//         root: null, // Use the viewport as the root
+//         rootMargin: '0px',
+//         threshold: 0.1 // Trigger when 10% of the element is visible
+//     };
+
+//     // Create the Intersection Observer
+//     const observer = new IntersectionObserver(handleIntersection, options);
+
+//     // Target all sections with the class 'section-content'
+//     const sections = document.querySelectorAll('.section-content');
+//     sections.forEach(section => observer.observe(section));
+// });
+
+
+
 //step 1: get DOM
 let nextDom = document.getElementById('next');
 let prevDom = document.getElementById('prev');
@@ -48,7 +108,26 @@ function showSlider(type){
     }, timeAutoNext)
 }
 
-// Form validation
+// button
+ function goToHashTag(idHashTag) {
+    document.getElementById(idHashTag).scrollIntoView({ behavior: 'smooth' });
+};
+
+// href
+
+document.addEventListener('DOMContentLoaded', function () {
+    const scrollLinks = document.querySelectorAll('.scroll-link');
+
+    scrollLinks.forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default anchor click behavior
+            const targetId = this.getAttribute('href').substring(1); // Get the target ID from href
+            document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+});
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const now = new Date();
     const options = { 
@@ -139,6 +218,11 @@ document.getElementById("infoForm").addEventListener("submit", function(event) {
 
     // If the form is valid, submit data to Google Sheets
     if (isValid) {
+        // Disable submit button and show loading spinner
+        const submitButton = document.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang gửi...';
+
         const formData = new FormData(document.forms['submit-to-google-sheet']);
         fetch('https://script.google.com/macros/s/AKfycbxwbgi7kn5AOf_O6ozVVr4tTw8NpF88TNovMXAxxBIz-el1fW48B3WDsuT0vou_DXrW/exec', {
             method: 'POST',
@@ -154,6 +238,73 @@ document.getElementById("infoForm").addEventListener("submit", function(event) {
         })
         .catch(error => {
             console.error('Error:', error);
+        })
+        .finally(() => {
+            // Re-enable submit button and reset text
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Gửi';
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    function initCarousel(carouselSelector) {
+        const carousel = document.querySelector(carouselSelector);
+        const carouselInner = carousel.querySelector('.carousel-inner');
+        const items = carouselInner.querySelectorAll('.carousel-item');
+        const totalItems = items.length;
+        
+        // Clone items for a truly infinite loop
+        items.forEach(item => {
+            const clone = item.cloneNode(true);
+            carouselInner.appendChild(clone);
+        });
+
+        let currentIndex = 0;
+        const itemWidth = items[0].offsetWidth;
+        const transitionDuration = 500; // ms
+        const pauseDuration = 2000; // ms
+        const fadeDuration = 300; // ms
+
+        // Set initial position
+        carouselInner.style.transform = `translateX(0)`;
+
+        function slideNext() {
+            currentIndex++;
+            carouselInner.style.transition = `transform ${transitionDuration}ms linear`;
+            carouselInner.style.transform = `translateX(${-currentIndex * itemWidth}px)`;
+
+            // If we've reached the cloned set
+            if (currentIndex >= totalItems) {
+                // Start fading out
+                setTimeout(() => {
+                    carouselInner.style.transition = `opacity ${fadeDuration}ms ease`;
+                    carouselInner.style.opacity = '0';
+                }, transitionDuration - fadeDuration);
+
+                // After the transition and fade out are complete, reset and fade in
+                setTimeout(() => {
+                    carouselInner.style.transition = 'none';
+                    currentIndex = 0;
+                    carouselInner.style.transform = `translateX(0)`;
+                    
+                    // Force a reflow before fading in
+                    carouselInner.offsetHeight;
+
+                    carouselInner.style.transition = `opacity ${fadeDuration}ms ease`;
+                    carouselInner.style.opacity = '1';
+                }, transitionDuration);
+            }
+        }
+
+        function startCarousel() {
+            setInterval(slideNext, pauseDuration);
+        }
+
+        startCarousel();
+    }
+
+    // Initialize both carousels
+    initCarousel('.daily-carousel');
+    initCarousel('.partner-logo-carousel');
 });
