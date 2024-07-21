@@ -92,25 +92,26 @@ header a{
 }
 .carousel .list .item .buttons button{
     border: none;
-    background-color: #201e1e;
-    color: #fff;
+    /* background-color: #201e1e; */
+    background-color: #fff;
+    color: #000;
     letter-spacing: 3px;
     font-family: Poppins;
     font-weight: 500;
 }
 .carousel .list .item .buttons :hover{
     background-color: #f1683a ;
-    color: #000;
+    color: #fff;
     transition: 0.2s;
 }
 .carousel .list .item .buttons button:nth-child(2){
     background-color: transparent;
-    border: 1px solid #fff;
-    color: #000;
+    border: 1px solid #000;
+    color: #fff;
 }
 .carousel .list .item .buttons button:nth-child(2):hover{
     background-color: #f1683a ;
-    color: #fff;
+    color: #000;
     transition: 0.2s;
 
 }
